@@ -17,11 +17,22 @@ router.post('/add', async (req, res) => {
     // console.log('-----------', req.body.title)
     const recipe = new Recipe({ title, description })
 
-    recipe.save()
+    await recipe.save()
     res.json({ msg: 'Рецепт був доданий' })
   } catch (e) {
     console.log(e)
     res.json({ msg: 'Щось пішло не так' })
+  }
+})
+
+router.delete('/delete/:id', async (req, res) => {
+  try {
+    Recipe.findByIdAndRemove(req.params.id, (err) => {
+      if (err) return res.status(500).send('There was a problem deleting the user.')
+      res.json({ success: true, message: 'Recipe deleted.' })
+    })
+  } catch (e) {
+    console.log(e)
   }
 })
 
