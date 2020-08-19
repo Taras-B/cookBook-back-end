@@ -9,13 +9,15 @@ const connectMongoDb = require('./libs/connectMongo')
 
 const app = express()
 
-app.use(cors())
-app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors())
 
 app.get('/', (req, res) => {
   res.send('hello')
 })
+
+app.use('/api/recipes', require('./routes/recipes'))
 
 app.use((req, res) => {
   res.status(404)
