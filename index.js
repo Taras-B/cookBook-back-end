@@ -1,7 +1,11 @@
 const express = require('express')
+const mongoose = require('mongoose')
+
 const bodyParser = require('body-parser')
 const cors = require('cors')
 require('dotenv').config()
+
+const connectMongoDb = require('./libs/connectMongo')
 
 const app = express()
 
@@ -13,6 +17,14 @@ app.get('/', (req, res) => {
   res.send('hello')
 })
 
-app.listen(process.env.PORT, () => {
-  console.log('start')
+app.use((req, res) => {
+  res.status(404)
+  res.json({ errorMsg: 'Not Found' })
+})
+
+// start()
+connectMongoDb()
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Server has been started on port: ' + process.env.PORT)
 })
