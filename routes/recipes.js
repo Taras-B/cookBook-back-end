@@ -18,7 +18,7 @@ router.post('/add', async (req, res) => {
     // console.log('-----------', req.body.title)
     const recipe = new Recipe({ title, description })
 
-    await recipe.save()
+    const pro = await recipe.save()
     res.json({ message: 'Рецепт був доданий' })
   } catch (e) {
     console.log(e)
