@@ -9,6 +9,11 @@ const recipeSchema = new Schema({
     type: String,
     required: true,
   },
+  date: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
 })
 
 module.exports = model('Recipe', recipeSchema)

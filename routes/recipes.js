@@ -5,10 +5,10 @@ const Recipe = require('../models/recipe')
 router.get('/', async (req, res) => {
   try {
     const recipes = await Recipe.find().lean()
-    res.json({ recipes: recipes })
+    res.json({ success: true, recipes: recipes })
   } catch (e) {
     console.log(e)
-    res.json({ message: 'Щось пішло не так' })
+    res.json({ success: false, message: 'Something is wrong' })
   }
 })
 
@@ -16,13 +16,13 @@ router.post('/add', async (req, res) => {
   try {
     const { title, description } = req.body
     // console.log('-----------', req.body.title)
-    const recipe = new Recipe({ title, description })
+    const newRecipe = new Recipe({ title, description })
 
-    const pro = await recipe.save()
-    res.json({ message: 'Рецепт був доданий' })
+    const recipe = await newRecipe.save()
+    res.json({ recipe, success: true, message: 'The recipe has been added' })
   } catch (e) {
     console.log(e)
-    res.json({ message: 'Щось пішло не так' })
+    res.json({ success: false, message: 'Something is wrong' })
   }
 })
 
@@ -42,6 +42,7 @@ router.post('/edit/:id', async (req, res) => {
 
 router.delete('/delete/:id', async (req, res) => {
   try {
+    console.log(req.params.id)
     await Recipe.findByIdAndRemove(req.params.id, (err) => {
       if (err)
         return res
