@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/api/recipes', require('./routes/recipes'))
+app.use('/api/auth', require('./routes/auth'))
 
 app.use((req, res) => {
   res.status(404)
