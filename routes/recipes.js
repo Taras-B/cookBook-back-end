@@ -12,7 +12,6 @@ const Recipe = require('../models/recipe')
 
 router.get('/', userAuth, async (req, res) => {
   try {
-    console.log('USER****', req.user)
     const recipes = await Recipe.find().lean()
     res.json({ success: true, recipes: recipes })
   } catch (e) {
