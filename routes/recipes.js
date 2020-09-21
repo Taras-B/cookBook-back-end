@@ -1,14 +1,18 @@
 const router = require('express').Router()
 
+// const passport = require('passport')
+const { userAuth } = require('../libs/auth')
 const Recipe = require('../models/recipe')
+
 /**
  * @Route GET ~api/recipes/
  * @Desc     Get recipes
- * @Access   Private
+ * @Access   Public
  */
 
-router.get('/', async (req, res) => {
+router.get('/', userAuth, async (req, res) => {
   try {
+    console.log('USER****', req.user)
     const recipes = await Recipe.find().lean()
     res.json({ success: true, recipes: recipes })
   } catch (e) {
@@ -17,7 +21,13 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.post('/add', async (req, res) => {
+/**
+ * @Route POST ~api/recipes/add
+ * @Desc     Add recipe
+ * @Access   Private
+ */
+
+router.post('/add', userAuth, async (req, res) => {
   try {
     const { title, description } = req.body
     // console.log('-----------', req.body.title)
@@ -31,7 +41,13 @@ router.post('/add', async (req, res) => {
   }
 })
 
-router.post('/edit/:id', async (req, res) => {
+/**
+ * @Route POST ~api/recipes/edit/:id
+ * @Desc     Edit recipe by ID
+ * @Access   Private
+ */
+
+router.post('/edit/:id', userAuth, async (req, res) => {
   try {
     await Recipe.findByIdAndUpdate(req.params.id, req.body, (err) => {
       if (err)
@@ -45,7 +61,13 @@ router.post('/edit/:id', async (req, res) => {
   }
 })
 
-router.delete('/delete/:id', async (req, res) => {
+/**
+ * @Route POST ~api/recipes/delete/:id
+ * @Desc     Delete recipe by id
+ * @Access   Private
+ */
+
+router.delete('/delete/:id', userAuth, async (req, res) => {
   try {
     console.log(req.params.id)
     await Recipe.findByIdAndRemove(req.params.id, (err) => {

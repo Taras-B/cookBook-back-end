@@ -1,5 +1,6 @@
 const express = require('express')
 const mongoose = require('mongoose')
+const passport = require('passport')
 
 const bodyParser = require('body-parser')
 const cors = require('cors')
@@ -12,6 +13,9 @@ const app = express()
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(cors())
+app.use(passport.initialize())
+
+require('./middleware/passport')(passport)
 
 app.get('/', (req, res) => {
   res.send('hello world')

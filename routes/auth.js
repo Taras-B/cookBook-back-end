@@ -7,8 +7,8 @@ require('dotenv').config()
 const { check, validationResult } = require('express-validator')
 
 /** @route    POST ~api/auth/register
- *   @desc     Register user
- *   @access   Public
+ *  @desc     Register user
+ *  @access   Public
  */
 
 router.post(
