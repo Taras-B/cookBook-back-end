@@ -1,6 +1,11 @@
 const router = require('express').Router()
 
 const Recipe = require('../models/recipe')
+/**
+ * @Route GET ~api/recipes/
+ * @Desc     Get recipes
+ * @Access   Private
+ */
 
 router.get('/', async (req, res) => {
   try {

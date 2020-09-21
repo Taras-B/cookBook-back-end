@@ -14,6 +14,10 @@ const recipeSchema = new Schema({
     required: true,
     default: Date.now,
   },
+  user_id: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
 })
 
 module.exports = model('Recipe', recipeSchema)
