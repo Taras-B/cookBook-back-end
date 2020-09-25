@@ -10,9 +10,25 @@ const Recipe = require('../models/recipe')
  * @Access   Public
  */
 
-router.get('/', userAuth, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
-    const recipes = await Recipe.find().lean()
+    const recipes = await Recipe.find()
+    res.json({ success: true, recipes: recipes })
+  } catch (e) {
+    console.log(e)
+    res.json({ success: false, message: 'Something is wrong' })
+  }
+})
+
+/**
+ * @Route GET ~api/recipes/my
+ * @Desc     Get user recipes
+ * @Access   Private
+ */
+
+router.get('/my', userAuth, async (req, res) => {
+  try {
+    const recipes = await Recipe.find({ user_id: req.user._id }).lean()
     res.json({ success: true, recipes: recipes })
   } catch (e) {
     console.log(e)
@@ -30,7 +46,7 @@ router.post('/add', userAuth, async (req, res) => {
   try {
     const { title, description } = req.body
     // console.log('-----------', req.body.title)
-    const newRecipe = new Recipe({ title, description })
+    const newRecipe = new Recipe({ title, description, user_id: req.user._id })
 
     const recipe = await newRecipe.save()
     res.json({ recipe, success: true, message: 'The recipe has been added' })
