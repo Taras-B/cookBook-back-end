@@ -6,13 +6,13 @@ const Recipe = require('../models/recipe')
 
 /**
  * @Route GET ~api/recipes/
- * @Desc     Get recipes
+ * @Desc     Get all recipes
  * @Access   Public
  */
 
 router.get('/', async (req, res) => {
   try {
-    const recipes = await Recipe.find()
+    const recipes = await Recipe.find().populate('user_id').exec()
     res.json({ success: true, recipes: recipes })
   } catch (e) {
     console.log(e)
@@ -22,13 +22,15 @@ router.get('/', async (req, res) => {
 
 /**
  * @Route GET ~api/recipes/my
- * @Desc     Get user recipes
+ * @Desc     Get recipes user
  * @Access   Private
  */
 
 router.get('/my', userAuth, async (req, res) => {
   try {
-    const recipes = await Recipe.find({ user_id: req.user._id }).lean()
+    const recipes = await Recipe.find({ user_id: req.user._id })
+      .populate('user_id')
+      .exec()
     res.json({ success: true, recipes: recipes })
   } catch (e) {
     console.log(e)
@@ -45,13 +47,18 @@ router.get('/my', userAuth, async (req, res) => {
 router.post('/add', userAuth, async (req, res) => {
   try {
     const { title, description } = req.body
-    // console.log('-----------', req.body.title)
     const newRecipe = new Recipe({ title, description, user_id: req.user._id })
 
-    const recipe = await newRecipe.save()
-    res.json({ recipe, success: true, message: 'The recipe has been added' })
+    const findRecipe = await newRecipe.save()
+
+    res.json({
+      recipe: await Recipe.findById(findRecipe._id).populate('user_id').exec(),
+      success: true,
+      message: 'The recipe has been added',
+    })
   } catch (e) {
     console.log(e)
+
     res.json({ success: false, message: 'Something is wrong' })
   }
 })
@@ -64,36 +71,51 @@ router.post('/add', userAuth, async (req, res) => {
 
 router.post('/edit/:id', userAuth, async (req, res) => {
   try {
-    await Recipe.findByIdAndUpdate(req.params.id, req.body, (err) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ success: false, message: 'There was a problem updating the recipe.' })
-      res.json({ success: true, message: 'Recipe updated.' })
-    })
+    await Recipe.findOneAndUpdate(
+      { _id: req.params.id, user_id: req.user._id },
+      req.body,
+      { new: true },
+      (err, doc) => {
+        if (err || !doc) {
+          return res
+            .status(400)
+            .json({ success: false, message: 'There was a problem updating the recipe.' })
+        }
+        console.log(doc)
+        res.json({ success: true, message: 'Recipe updated.' })
+      }
+    )
   } catch (e) {
     console.log(e)
+    res
+      .status(500)
+      .json({ success: false, message: 'There was a problem updating the recipe.' })
   }
 })
 
 /**
- * @Route POST ~api/recipes/delete/:id
+ * @Route DELETE ~api/recipes/delete/:id
  * @Desc     Delete recipe by id
  * @Access   Private
  */
 
 router.delete('/delete/:id', userAuth, async (req, res) => {
   try {
-    console.log(req.params.id)
-    await Recipe.findByIdAndRemove(req.params.id, (err) => {
-      if (err)
-        return res
-          .status(500)
-          .json({ success: false, message: 'There was a problem deleting the recipe.' })
-      res.json({ success: true, message: 'Recipe deleted.' })
-    })
+    await Recipe.findOneAndRemove(
+      { _id: req.params.id, user_id: req.user._id },
+      (err, doc) => {
+        if (err || !doc)
+          return res
+            .status(400)
+            .json({ success: false, message: 'There was a problem deleting the recipe.' })
+        res.json({ success: true, message: 'Recipe deleted.' })
+      }
+    )
   } catch (e) {
     console.log(e)
+    res
+      .status(500)
+      .json({ success: false, message: 'There was a problem deleting the recipe.' })
   }
 })
 

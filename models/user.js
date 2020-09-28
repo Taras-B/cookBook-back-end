@@ -19,8 +19,9 @@ const userSchema = new Schema({
     required: true,
     minlength: 6,
     maxlength: 255,
+    select: false,
   },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now, select: false },
 })
 
 module.exports = model('User', userSchema)

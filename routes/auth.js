@@ -73,9 +73,8 @@ router.post(
     }
 
     try {
-      let { email, password } = req.body
-
-      const user = await User.findOne({ email })
+      const { email, password } = req.body
+      const user = await User.findOne({ email }).select('+password')
 
       if (!user) {
         return res.status(404).json({
@@ -87,7 +86,7 @@ router.post(
       let isMatch = await bcrypt.compare(password, user.password)
 
       if (isMatch) {
-        let token = jwt.sign(
+        const token = jwt.sign(
           {
             id: user._id,
             email: user.email,
@@ -95,18 +94,15 @@ router.post(
           },
           process.env.JWT_SECRET,
           {
-            expiresIn: 60 * 60,
+            expiresIn: '2d',
           }
         )
-
-        let result = {
-          username: user.username,
-          email: user.email,
-          token: `Bearer ${token}`,
-        }
-
         return res.status(200).json({
-          ...result,
+          data: {
+            username: user.username,
+            email: user.email,
+            token: `Bearer ${token}`,
+          },
           message: 'You are now logged in.',
           success: true,
         })
@@ -117,7 +113,7 @@ router.post(
         })
       }
     } catch (err) {
-      console.log(err.message)
+      console.log('ERROR', err)
       return res
         .status(500)
         .json({ message: 'Server error please try again.', success: false })
