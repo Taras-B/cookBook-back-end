@@ -1,8 +1,7 @@
 const router = require('express').Router()
 
-// const passport = require('passport')
-const { userAuth } = require('../libs/auth')
 const Recipe = require('../models/recipe')
+const { userAuth } = require('../libs/auth')
 
 /**
  * @Route GET ~api/recipes/

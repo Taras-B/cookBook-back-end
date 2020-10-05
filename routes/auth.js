@@ -5,6 +5,7 @@ const router = require('express').Router()
 require('dotenv').config()
 
 const { check, validationResult } = require('express-validator')
+const { userAuth } = require('../libs/auth')
 
 /** @route    POST ~api/auth/register
  *  @desc     Register user
@@ -99,11 +100,12 @@ router.post(
         )
         return res.status(200).json({
           data: {
+            _id: user._id,
             username: user.username,
             email: user.email,
             token: `Bearer ${token}`,
           },
-          message: 'You are now logged in.',
+          message: 'You are now logged.',
           success: true,
         })
       } else {
@@ -120,5 +122,21 @@ router.post(
     }
   }
 )
+
+/**
+ * @Route GET ~api/auth/user
+ * @Desc Current user
+ * @access Private
+ */
+
+router.get('/user', userAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id)
+    res.json({ success: true, user })
+  } catch (e) {
+    console.log('ERROR_GET_USER', e)
+    res.status(500).json({ success: false, message: 'Server error please try again.' })
+  }
+})
 
 module.exports = router
